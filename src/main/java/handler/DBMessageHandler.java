@@ -1,6 +1,9 @@
 package handler;
 
 import database.reply.DBLoginReply;
+import database.reply.DBMenuJsonReply;
+import database.reply.DBMenuPictureReply;
+import database.request.DBRecommendationRequest;
 import io.vertx.core.Handler;
 import io.vertx.core.eventbus.Message;
 import database.DBReply;
@@ -16,6 +19,15 @@ public class DBMessageHandler<DBRequest> implements Handler<Message<DBRequest>> 
         DBRequest req = msg.body();
         DBReply reply = null;
         if(req instanceof DBLoginReply){
+            //TODO
+        }
+        if(req instanceof DBMenuPictureReply){
+            //TODO
+        }
+        if(req instanceof DBMenuJsonReply){
+            //TODO
+        }
+        if(req instanceof DBRecommendationRequest){
             //TODO
         }
 

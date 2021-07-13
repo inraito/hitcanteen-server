@@ -1,4 +1,4 @@
-package handler.dbReplyHandler;
+package handler.dbReply;
 
 import database.reply.DBLoginReply;
 import io.vertx.core.AsyncResult;
@@ -19,7 +19,9 @@ public class DBLoginReplyHandler implements Handler<AsyncResult<Message<DBLoginR
             ctx.response().write(var1.result().body().result);
             ctx.response().end();
         }
-
+        else{
+            ctx.response().end("failure");
+        }
     }
 
 }
