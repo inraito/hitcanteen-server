@@ -11,11 +11,11 @@ import database.DBRequest;
 
 
 public class DBVerticle extends AbstractVerticle {
-    MySQLPool client = null;
-    EventBus eb = vertx.eventBus();
+    public MySQLPool Client;
+    public final EventBus eb = vertx.eventBus();
     @Override
     public void start(Promise<Void> startPromise){
-        MySQLConnectOptions connectOptions = new MySQLConnectOptions()
+        MySQLConnectOptions userConnectOptions = new MySQLConnectOptions()
                 .setPort(Lib.dbPort)
                 .setHost(Lib.dbHost)
                 .setDatabase(Lib.dbDatabase)
@@ -23,7 +23,8 @@ public class DBVerticle extends AbstractVerticle {
                 .setPassword(Lib.dbPassword);
         PoolOptions poolOptions = new PoolOptions()
                 .setMaxSize(5);
-        this.client = MySQLPool.pool(connectOptions, poolOptions);
+        this.Client = MySQLPool.pool(userConnectOptions, poolOptions);
+
         eb.consumer("db.receiver", new DBMessageHandler<DBRequest>(this));
     }
 }

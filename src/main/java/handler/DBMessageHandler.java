@@ -3,10 +3,14 @@ package handler;
 import database.reply.DBLoginReply;
 import database.reply.DBMenuJsonReply;
 import database.reply.DBMenuPictureReply;
+import database.request.DBLoginRequest;
+import database.request.DBMenuJsonRequest;
+import database.request.DBMenuPictureRequest;
 import database.request.DBRecommendationRequest;
 import io.vertx.core.Handler;
 import io.vertx.core.eventbus.Message;
 import database.DBReply;
+import io.vertx.sqlclient.Tuple;
 import verticle.DBVerticle;
 
 public class DBMessageHandler<DBRequest> implements Handler<Message<DBRequest>> {
@@ -17,22 +21,54 @@ public class DBMessageHandler<DBRequest> implements Handler<Message<DBRequest>> 
     @Override
     public void handle(Message<DBRequest> msg) {
         DBRequest req = msg.body();
-        DBReply reply = null;
-        if(req instanceof DBLoginReply){
-            //TODO
+        if(req instanceof DBLoginRequest){
+            DBLoginRequest request = (DBLoginRequest) req;
+            dbVerticle.Client.getConnection( ar -> {
+                if(ar.succeeded()){
+                    ar.result().query("SELECT * FROM User WHERE account = " + request.account +" and password = " + request.password)
+                            .execute(result -> {
+                                if(result.succeeded()){
+                                    if(result.result().size()==0){
+                                        msg.reply(new DBLoginReply("success"));
+                                    }
+                                    else{
+                                        msg.reply(new DBLoginReply("failure"));
+                                    }
+                                }
+                                else{
+                                    msg.fail(0, "Connection Failure");
+                                }
+                            });
+                }
+                else{
+                    msg.fail(0, "Connection Failure");
+                }
+            });
         }
-        if(req instanceof DBMenuPictureReply){
-            //TODO
+        if(req instanceof DBMenuPictureRequest){
+            DBMenuPictureRequest request = (DBMenuPictureRequest) req;
+            dbVerticle.Client.getConnection( ar -> {
+                if(ar.succeeded()){
+                    ar.result().query("SELECT * FROM Path")
+                            .execute(result -> {
+                                if(result.succeeded()){
+                                    //TODO
+                                }
+                                else{
+                                    msg.fail(0, "Connection Failure");
+                                }
+                            });
+                }
+                else{
+                    msg.fail(0, "Connection Failure");
+                }
+            });
         }
-        if(req instanceof DBMenuJsonReply){
+        if(req instanceof DBMenuJsonRequest){
             //TODO
         }
         if(req instanceof DBRecommendationRequest){
             //TODO
         }
-
-
-
-        msg.reply(reply);
     }
 }
