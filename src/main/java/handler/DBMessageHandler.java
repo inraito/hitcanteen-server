@@ -3,6 +3,7 @@ package handler;
 import database.reply.DBLoginReply;
 import database.reply.DBMenuJsonReply;
 import database.reply.DBMenuPictureReply;
+import database.reply.DBRecommendationReply;
 import database.request.DBLoginRequest;
 import database.request.DBMenuJsonRequest;
 import database.request.DBMenuPictureRequest;
@@ -29,7 +30,7 @@ public class DBMessageHandler<DBRequest> implements Handler<Message<DBRequest>> 
                     ar.result().query("SELECT * FROM User WHERE account = " + request.account +" and password = " + request.password)
                             .execute(result -> {
                                 if(result.succeeded()){
-                                    if(result.result().size()==0){
+                                    if(result.result().size()==1){
                                         msg.reply(new DBLoginReply("success"));
                                     }
                                     else{
@@ -87,10 +88,58 @@ public class DBMessageHandler<DBRequest> implements Handler<Message<DBRequest>> 
         }
 
         if(req instanceof DBMenuJsonRequest){
-            //TODO
+            DBMenuJsonRequest request = (DBMenuJsonRequest)req;
+            dbVerticle.Client.getConnection( ar -> {
+                if(ar.succeeded()){
+                    ar.result().query("SELECT * FROM Data")
+                            .execute(result -> {
+                                if(result.succeeded()){
+                                    if(result.result().size()!=0){
+                                        DBMenuJsonReply reply = new DBMenuJsonReply();
+                                        for(Row row:result.result()){
+                                            reply.put(row.toJson());
+                                        }
+                                        msg.reply(reply);
+                                    }
+                                    else{
+                                        msg.fail(0, "Invalid Data in Database");
+                                    }
+                                }
+                                else{
+                                    msg.fail(0, "Connection Failure");
+                                }
+                            });
+                }
+                else{
+                    msg.fail(0, "Connection Failure");
+                }
+            });
         }
         if(req instanceof DBRecommendationRequest){
-            //TODO
+            DBRecommendationRequest request = (DBRecommendationRequest)req;
+            dbVerticle.Client.getConnection( ar -> {
+                if(ar.succeeded()){
+                    ar.result().query("SELECT * FROM Data")
+                            .execute(result -> {
+                                if(result.succeeded()){
+                                    if(result.result().size()!=0){
+                                        DBRecommendationReply reply = new DBRecommendationReply();
+                                        //TODO
+                                        msg.reply(reply);
+                                    }
+                                    else{
+                                        msg.fail(0, "Invalid Data in Database");
+                                    }
+                                }
+                                else{
+                                    msg.fail(0, "Connection Failure");
+                                }
+                            });
+                }
+                else{
+                    msg.fail(0, "Connection Failure");
+                }
+            });
         }
     }
 }
