@@ -5,43 +5,10 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.Message;
-import io.vertx.core.file.AsyncFile;
 import io.vertx.core.file.FileSystem;
 import io.vertx.core.file.OpenOptions;
 import io.vertx.ext.web.RoutingContext;
 
-import java.util.ArrayList;
-
-class FileOpenCompletedHandler implements  Handler<AsyncResult<AsyncFile>>{
-    private final int count;
-    private final ArrayList<String> arrayList;
-    private final RoutingContext ctx;
-    private final FileSystem fs;
-    public FileOpenCompletedHandler(int i, ArrayList<String> arrayList, RoutingContext ctx, FileSystem fs){
-        this.count = i;
-        this.arrayList = arrayList;
-        this.ctx = ctx;
-        this.fs = fs;
-    }
-    @Override
-    public void handle(AsyncResult<AsyncFile> result) {
-        if (result.succeeded()) {
-            result.result().pipeTo(ctx.response(), ar -> {
-                if(ar.succeeded()){
-                    if(count<arrayList.size()-1)
-                        fs.open(arrayList.get(count+1), new OpenOptions(), new FileOpenCompletedHandler(count+1,arrayList, ctx, fs));
-                    else
-                        ctx.response().end();
-                }
-                else{
-                        ctx.response().end();
-                }
-            });
-        } else {
-                ctx.response().end();
-        }
-    }
-}
 
 public class DBMenuPictureReplyHandler implements Handler<AsyncResult<Message<DBMenuPictureReply>>> {
     private final RoutingContext ctx;
@@ -55,8 +22,27 @@ public class DBMenuPictureReplyHandler implements Handler<AsyncResult<Message<DB
     public void handle(AsyncResult<Message<DBMenuPictureReply>> var1){
         if(var1.succeeded()){
             FileSystem fs = vertx.fileSystem();
-            ArrayList<String> arrayList = var1.result().body().getList();//get paths
-            fs.open(arrayList.get(0), new OpenOptions(), new FileOpenCompletedHandler(0,arrayList, ctx, fs));
+            int uuid = Integer.parseInt(ctx.request().headers().get("uuid"));
+            if(uuid==-1){
+                ctx.response().end(Integer.toString(var1.result().body().number));
+            }
+            else{
+                fs.open(var1.result().body().path, new OpenOptions(), ar->{
+                    if(ar.succeeded()){
+                        ar.result().pipeTo(ctx.response(), result->{
+                            if(result.succeeded()){
+                                ctx.response().end();
+                            }
+                            else{
+                                ctx.response().end("failure");
+                            }
+                        });
+                    }
+                    else{
+                        ctx.response().end("failure");
+                    }
+                });
+            }
         }
         else{
             ctx.response().end("failure");

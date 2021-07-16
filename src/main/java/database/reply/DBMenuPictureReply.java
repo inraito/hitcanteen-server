@@ -5,16 +5,16 @@ import database.DBReply;
 import java.util.ArrayList;
 
 public class DBMenuPictureReply extends DBReply {
-    private final ArrayList<String> path;
-    public DBMenuPictureReply(){
-        this.path = new ArrayList<>();
+    public String path;
+    public int number;
+    private DBMenuPictureReply(String path, int number){
+        this.path =path;
+        this.number = number;
     }
-
-    public void put(String p){
-        this.path.add(p);
+    public DBMenuPictureReply(String path){
+        new DBMenuPictureReply(path, -1);
     }
-    public ArrayList<String> getList(){
-        return this.path;
+    public DBMenuPictureReply(int number){
+        new DBMenuPictureReply(null, number);
     }
-
 }

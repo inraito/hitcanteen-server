@@ -10,11 +10,12 @@ import database.request.DBRecommendationRequest;
 import io.vertx.core.Handler;
 import io.vertx.core.eventbus.Message;
 import database.DBReply;
+import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.Tuple;
 import verticle.DBVerticle;
 
 public class DBMessageHandler<DBRequest> implements Handler<Message<DBRequest>> {
-    private DBVerticle dbVerticle;
+    private final DBVerticle dbVerticle;
     public DBMessageHandler(DBVerticle dbVerticle){
         this.dbVerticle = dbVerticle;
     }
@@ -45,25 +46,46 @@ public class DBMessageHandler<DBRequest> implements Handler<Message<DBRequest>> 
                 }
             });
         }
+
         if(req instanceof DBMenuPictureRequest){
             DBMenuPictureRequest request = (DBMenuPictureRequest) req;
             dbVerticle.Client.getConnection( ar -> {
                 if(ar.succeeded()){
-                    ar.result().query("SELECT * FROM Path")
-                            .execute(result -> {
-                                if(result.succeeded()){
-                                    //TODO
-                                }
-                                else{
-                                    msg.fail(0, "Connection Failure");
-                                }
-                            });
+                    if(request.uuid==-1) {
+                        ar.result().query("SELECT * FROM Path")
+                                .execute(result -> {
+                                    if (result.succeeded()) {
+                                        msg.reply(new DBMenuPictureReply(result.result().size()));
+                                    } else {
+                                        msg.fail(0, "Connection Failure");
+                                    }
+                                });
+                    }
+                    else{
+                        ar.result().query("SELECT * FROM Path WHERE uuid = " + Integer.toString(request.uuid))
+                                .execute(result -> {
+                                    if (result.succeeded()) {
+                                        if(result.result().size()==1){
+                                            for(Row row:result.result()){
+                                                msg.reply(new DBMenuPictureReply(row.getString("uuid")));
+                                                break;
+                                            }
+                                        }
+                                        else{
+                                            msg.fail(0, "Invalid Data in Database");
+                                        }
+                                    } else {
+                                        msg.fail(0, "Connection Failure");
+                                    }
+                                });
+                    }
                 }
                 else{
                     msg.fail(0, "Connection Failure");
                 }
             });
         }
+
         if(req instanceof DBMenuJsonRequest){
             //TODO
         }
