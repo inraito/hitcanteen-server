@@ -1,13 +1,7 @@
 package handler;
 
-import database.reply.DBLoginReply;
-import database.reply.DBMenuJsonReply;
-import database.reply.DBMenuPictureReply;
-import database.reply.DBRecommendationReply;
-import database.request.DBLoginRequest;
-import database.request.DBMenuJsonRequest;
-import database.request.DBMenuPictureRequest;
-import database.request.DBRecommendationRequest;
+import database.reply.*;
+import database.request.*;
 import io.vertx.core.Handler;
 import io.vertx.core.eventbus.Message;
 import database.DBReply;
@@ -27,7 +21,7 @@ public class DBMessageHandler<DBRequest> implements Handler<Message<DBRequest>> 
             DBLoginRequest request = (DBLoginRequest) req;
             dbVerticle.Client.getConnection( ar -> {
                 if(ar.succeeded()){
-                    ar.result().query("SELECT * FROM User WHERE account = " + request.account +" and password = " + request.password)
+                    ar.result().query("SELECT * FROM User WHERE account = '" + request.account +"' and password = '" + request.password + "'")
                             .execute(result -> {
                                 if(result.succeeded()){
                                     if(result.result().size()==1){
@@ -68,7 +62,7 @@ public class DBMessageHandler<DBRequest> implements Handler<Message<DBRequest>> 
                                     if (result.succeeded()) {
                                         if(result.result().size()==1){
                                             for(Row row:result.result()){
-                                                msg.reply(new DBMenuPictureReply(row.getString("uuid")));
+                                                msg.reply(new DBMenuPictureReply(row.getString("path")));
                                                 break;
                                             }
                                         }
@@ -76,13 +70,13 @@ public class DBMessageHandler<DBRequest> implements Handler<Message<DBRequest>> 
                                             msg.fail(0, "Invalid Data in Database");
                                         }
                                     } else {
-                                        msg.fail(0, "Connection Failure");
+                                        msg.fail(0, "Failure");
                                     }
                                 });
                     }
                 }
                 else{
-                    msg.fail(0, "Connection Failure");
+                    msg.fail(0, "Failure");
                 }
             });
         }
@@ -138,6 +132,25 @@ public class DBMessageHandler<DBRequest> implements Handler<Message<DBRequest>> 
                 }
                 else{
                     msg.fail(0, "Connection Failure");
+                }
+            });
+        }
+        if(req instanceof DBRegisterRequest){
+            DBRegisterRequest request = (DBRegisterRequest)req;
+            dbVerticle.Client.getConnection( ar -> {
+                if(ar.succeeded()){
+                    ar.result().query("INSERT INTO user (`account`, `password` ) VALUES('" + request.account + " ', '" + request.password + "') ")
+                            .execute(result -> {
+                                if(result.succeeded()){
+                                    msg.reply(new DBRegisterReply("success"));
+                                }
+                                else{
+                                    msg.reply(new DBRegisterReply("failure"));
+                                }
+                            });
+                }
+                else{
+                    msg.fail(0, "Failure");
                 }
             });
         }
