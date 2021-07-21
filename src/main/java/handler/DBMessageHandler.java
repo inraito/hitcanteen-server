@@ -17,6 +17,7 @@ public class DBMessageHandler<DBRequest> implements Handler<Message<DBRequest>> 
     @Override
     public void handle(Message<DBRequest> msg) {
         DBRequest req = msg.body();
+        System.err.println("enter DBMessageHandler");
         if(req instanceof DBLoginRequest){
             DBLoginRequest request = (DBLoginRequest) req;
             dbVerticle.Client.getConnection( ar -> {
@@ -25,18 +26,22 @@ public class DBMessageHandler<DBRequest> implements Handler<Message<DBRequest>> 
                             .execute(result -> {
                                 if(result.succeeded()){
                                     if(result.result().size()==1){
+                                        System.err.println("login successfully");
                                         msg.reply(new DBLoginReply("success"));
                                     }
                                     else{
+                                        System.err.println("true fail");
                                         msg.reply(new DBLoginReply("failure"));
                                     }
                                 }
                                 else{
+                                    System.err.println("fail at execute");
                                     msg.fail(0, "Connection Failure");
                                 }
                             });
                 }
                 else{
+                    System.err.println("fail at getConnection");
                     msg.fail(0, "Connection Failure");
                 }
             });
@@ -76,6 +81,7 @@ public class DBMessageHandler<DBRequest> implements Handler<Message<DBRequest>> 
                     }
                 }
                 else{
+
                     msg.fail(0, "Failure");
                 }
             });
@@ -88,6 +94,7 @@ public class DBMessageHandler<DBRequest> implements Handler<Message<DBRequest>> 
                     ar.result().query("SELECT * FROM Data")
                             .execute(result -> {
                                 if(result.succeeded()){
+                                    System.err.println("execute success");
                                     if(result.result().size()!=0){
                                         DBMenuJsonReply reply = new DBMenuJsonReply();
                                         for(Row row:result.result()){
@@ -100,6 +107,7 @@ public class DBMessageHandler<DBRequest> implements Handler<Message<DBRequest>> 
                                     }
                                 }
                                 else{
+                                    System.err.println("execute fail");
                                     msg.fail(0, "Connection Failure");
                                 }
                             });
@@ -136,20 +144,25 @@ public class DBMessageHandler<DBRequest> implements Handler<Message<DBRequest>> 
             });
         }
         if(req instanceof DBRegisterRequest){
+            System.err.println("enter DBMessageHandler");
             DBRegisterRequest request = (DBRegisterRequest)req;
             dbVerticle.Client.getConnection( ar -> {
                 if(ar.succeeded()){
                     ar.result().query("INSERT INTO user (`account`, `password` ) VALUES('" + request.account + " ', '" + request.password + "') ")
                             .execute(result -> {
                                 if(result.succeeded()){
+                                    System.err.println("success in execute");
+
                                     msg.reply(new DBRegisterReply("success"));
                                 }
                                 else{
+                                    System.err.println("fail in execute");
                                     msg.reply(new DBRegisterReply("failure"));
                                 }
                             });
                 }
                 else{
+                    System.err.println("fail at getConnection");
                     msg.fail(0, "Failure");
                 }
             });

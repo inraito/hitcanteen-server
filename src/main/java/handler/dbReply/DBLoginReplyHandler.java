@@ -16,10 +16,10 @@ public class DBLoginReplyHandler implements Handler<AsyncResult<Message<DBLoginR
     @Override
     public void handle(AsyncResult<Message<DBLoginReply>> var1){
         if(var1.succeeded()){
-            ctx.response().write(var1.result().body().result);
-            ctx.response().end();
+            ctx.response().end(var1.result().body().result);
         }
         else{
+            System.err.println("databaseFailure");
             ctx.response().end("failure");
         }
     }

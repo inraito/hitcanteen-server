@@ -18,6 +18,7 @@ public class DBRegisterReplyHandler implements Handler<AsyncResult<Message<DBReg
             ctx.response().end(var1.result().body().result);
         }
         else{
+
             ctx.response().end("failure");
         }
     }
