@@ -23,26 +23,21 @@ public class DBMenuPictureReplyHandler implements Handler<AsyncResult<Message<DB
         if(var1.succeeded()){
             FileSystem fs = vertx.fileSystem();
             int uuid = Integer.parseInt(ctx.request().headers().get("uuid"));
-            if(uuid==-1){
-                ctx.response().end(Integer.toString(var1.result().body().number));
-            }
-            else{
-                fs.open(var1.result().body().path, new OpenOptions(), ar->{
-                    if(ar.succeeded()){
-                        ar.result().pipeTo(ctx.response(), result->{
-                            if(result.succeeded()){
-                                ctx.response().end();
-                            }
-                            else{
-                                ctx.response().end("failure");
-                            }
-                        });
-                    }
-                    else{
-                        ctx.response().end("failure");
-                    }
-                });
-            }
+            fs.open(var1.result().body().path, new OpenOptions(), ar->{
+                if(ar.succeeded()){
+                    ar.result().pipeTo(ctx.response(), result->{
+                        if(result.succeeded()){
+                            ctx.response().end();
+                        }
+                        else{
+                            ctx.response().end("failure");
+                        }
+                    });
+                }
+                else{
+                    ctx.response().end("failure");
+                }
+            });
         }
         else{
             ctx.response().end("failure");
