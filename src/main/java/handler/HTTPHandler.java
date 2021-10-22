@@ -66,16 +66,19 @@ public class HTTPHandler {
         eb.request("db.receiver", new DBLoginRequest(account, password), new DBLoginReplyHandler(ctx));
     }
     private static void HandleMenuPicture(RoutingContext ctx){
+        System.out.println("enter handleMenuPicture");
         //eb.request("db.receiver", new DBMenuPictureRequest(Integer.parseInt(ctx.request().headers().get("uuid"))), new DBMenuPictureReplyHandler(ctx,vertx));
         FileSystem fs = vertx.fileSystem();
         int uuid = Integer.parseInt(ctx.request().headers().get("uuid"));
+        System.out.println("enter handleMenuPicture method");
         ctx.response().setChunked(true);
-        fs.open("/picture/" + ctx.request().headers().get("uuid"), new OpenOptions(), ar->{
+        fs.open("./picture/" + ctx.request().headers().get("uuid") + ".bmp", new OpenOptions(), ar->{
             if(ar.succeeded()){
-
+                System.out.println("picture open succeeded");
                 ar.result().pipeTo(ctx.response(), result->{
                     if(result.succeeded()){
                         ctx.response().end();
+                        System.out.println("pipe succeeded");
                     }
                     else{
                         ctx.response().end("failure");

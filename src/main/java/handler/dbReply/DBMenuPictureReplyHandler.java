@@ -28,6 +28,7 @@ public class DBMenuPictureReplyHandler implements Handler<AsyncResult<Message<DB
                     ar.result().pipeTo(ctx.response(), result->{
                         if(result.succeeded()){
                             ctx.response().end();
+                            System.out.println("pipe succeeded");
                         }
                         else{
                             ctx.response().end("failure");
