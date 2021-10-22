@@ -6,6 +6,8 @@ import handler.dbReply.*;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.eventbus.MessageCodec;
+import io.vertx.core.file.FileSystem;
+import io.vertx.core.file.OpenOptions;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.RoutingContext;
 
@@ -64,7 +66,24 @@ public class HTTPHandler {
         eb.request("db.receiver", new DBLoginRequest(account, password), new DBLoginReplyHandler(ctx));
     }
     private static void HandleMenuPicture(RoutingContext ctx){
-        eb.request("db.receiver", new DBMenuPictureRequest(Integer.parseInt(ctx.request().headers().get("uuid"))), new DBMenuPictureReplyHandler(ctx,vertx));
+        //eb.request("db.receiver", new DBMenuPictureRequest(Integer.parseInt(ctx.request().headers().get("uuid"))), new DBMenuPictureReplyHandler(ctx,vertx));
+        FileSystem fs = vertx.fileSystem();
+        int uuid = Integer.parseInt(ctx.request().headers().get("uuid"));
+        fs.open("/picture/" + ctx.request().headers().get("uuid"), new OpenOptions(), ar->{
+            if(ar.succeeded()){
+                ar.result().pipeTo(ctx.response(), result->{
+                    if(result.succeeded()){
+                        ctx.response().end();
+                    }
+                    else{
+                        ctx.response().end("failure");
+                    }
+                });
+            }
+            else{
+                ctx.response().end("failure");
+            }
+        });
     }
     private static void HandleMenuJson(RoutingContext ctx){
         eb.request("db.receiver", new DBMenuJsonRequest(), new DBMenuJsonReplyHandler(ctx));
