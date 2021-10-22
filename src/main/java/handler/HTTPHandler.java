@@ -69,8 +69,10 @@ public class HTTPHandler {
         //eb.request("db.receiver", new DBMenuPictureRequest(Integer.parseInt(ctx.request().headers().get("uuid"))), new DBMenuPictureReplyHandler(ctx,vertx));
         FileSystem fs = vertx.fileSystem();
         int uuid = Integer.parseInt(ctx.request().headers().get("uuid"));
+        ctx.response().setChunked(true);
         fs.open("/picture/" + ctx.request().headers().get("uuid"), new OpenOptions(), ar->{
             if(ar.succeeded()){
+
                 ar.result().pipeTo(ctx.response(), result->{
                     if(result.succeeded()){
                         ctx.response().end();
