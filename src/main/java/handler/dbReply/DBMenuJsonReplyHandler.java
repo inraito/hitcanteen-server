@@ -19,6 +19,7 @@ public class DBMenuJsonReplyHandler implements Handler<AsyncResult<Message<DBMen
     @Override
     public void handle(AsyncResult<Message<DBMenuJsonReply>> var1){
         if(var1.succeeded()){
+            ctx.response().setChunked(true);
             ArrayList<JsonObject> arrayList = var1.result().body().getJsonArray();
             for(int i=0;i<arrayList.size();i++){
                 if(i<arrayList.size()-1)
