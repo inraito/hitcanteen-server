@@ -93,8 +93,9 @@ public class HTTPHandler {
     }
     private static void HandleRecommendation(RoutingContext ctx){
         DBRecommendationRequest request = new DBRecommendationRequest();
-        if(ctx.get("tag")!="null")
-            request.put(ctx.get("tag"));
+        System.out.println(ctx.request().headers().get("tag"));
+        if(ctx.request().headers().get("tag")!=null)
+            request.put(ctx.request().headers().get("tag"));
         eb.request("db.receiver", request, new DBRecommendationReplyHandler(ctx));
     }
     private static void HandleRegister(RoutingContext ctx){

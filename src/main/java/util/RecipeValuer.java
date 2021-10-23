@@ -3,7 +3,7 @@ package util;
 import io.vertx.sqlclient.Row;
 
 public class RecipeValuer {
-    public static int max = 10;
+    public static int max = 100;
     public static int min = 1;
     public static boolean value(Row a, Row b){
         try {

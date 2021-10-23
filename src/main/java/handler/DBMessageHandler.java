@@ -118,6 +118,7 @@ public class DBMessageHandler<DBRequest> implements Handler<Message<DBRequest>> 
                                         Row result_drink = null;
                                         Row result_refreshments = null;
                                         for(Row r:result.result()){
+                                            System.out.println(r.toJson());
                                             switch(r.getString("category")){
                                                 case "refreshments":
                                                     if(result_refreshments==null){
@@ -136,20 +137,26 @@ public class DBMessageHandler<DBRequest> implements Handler<Message<DBRequest>> 
                                                         result_stapleFood = r;
                                                     break;
                                                 case "drink":
+                                                    System.out.println(r.toJson());
                                                     if(result_drink==null){
+                                                        System.out.println("result drink changed");
                                                         result_drink = r;
                                                         break;
                                                     }
                                                     else if(!value(result_drink, r))
                                                         result_drink = r;
                                             }
-                                            if(!(request.getTag().equals("noStaple")))
-                                                reply.put(result_stapleFood.toJson());
-                                            if(!(request.getTag().equals("noDrink")))
-                                                reply.put(result_drink.toJson());
-                                            if(!(request.getTag().equals("noRefreshments")))
-                                                reply.put(result_refreshments.toJson());
+
                                         }
+                                        System.out.println(result_drink.toJson());
+                                        System.out.println(result_refreshments.toJson());
+                                        System.out.println(result_stapleFood.toJson());
+                                        if(!(request.getTag().equals("noStaple")))
+                                            reply.put(result_stapleFood.toJson());
+                                        if(!(request.getTag().equals("noDrink")))
+                                            reply.put(result_drink.toJson());
+                                        if(!(request.getTag().equals("noRefreshments")))
+                                            reply.put(result_refreshments.toJson());
 
 
                                         msg.reply(reply);
