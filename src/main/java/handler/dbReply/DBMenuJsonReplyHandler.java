@@ -21,11 +21,15 @@ public class DBMenuJsonReplyHandler implements Handler<AsyncResult<Message<DBMen
         if(var1.succeeded()){
             ctx.response().setChunked(true);
             ArrayList<JsonObject> arrayList = var1.result().body().getJsonArray();
+            ctx.response().write("[");
             for(int i=0;i<arrayList.size();i++){
-                if(i<arrayList.size()-1)
-                    ctx.response().write(arrayList.get(i).encode());
+
+                if(i<arrayList.size()-1){
+                    ctx.response().write(arrayList.get(i).encode() + ",");
+                    System.out.println(arrayList.get(i).encode());
+                }
                 else{
-                    ctx.response().end(arrayList.get(i).encode());
+                    ctx.response().end(arrayList.get(i).encode() + "]");
                 }
             }
         }
