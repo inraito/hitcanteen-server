@@ -1,17 +1,20 @@
 package database.reply;
 
 import database.DBReply;
+import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 
+import java.util.ArrayList;
+
 public class DBRecommendationReply extends DBReply {
-    private final JsonObject jsonObject;
+    private final ArrayList<JsonObject> arrayList;
     public DBRecommendationReply(){
-        this.jsonObject = new JsonObject();
+        this.arrayList = new ArrayList<>();
     }
-    public void put(String key, String value){
-        jsonObject.put(key, value);
+    public void put(JsonObject jsonObject){
+        arrayList.add(jsonObject);
     }
-    public JsonObject getJsonObject(){
-        return this.jsonObject;
+    public ArrayList<JsonObject> getArrayList(){
+        return this.arrayList;
     }
 }

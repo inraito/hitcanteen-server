@@ -9,6 +9,7 @@ import io.vertx.core.eventbus.MessageCodec;
 import io.vertx.core.file.FileSystem;
 import io.vertx.core.file.OpenOptions;
 import io.vertx.core.http.HttpMethod;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 
 
@@ -91,7 +92,10 @@ public class HTTPHandler {
         eb.request("db.receiver", new DBMenuJsonRequest(), new DBMenuJsonReplyHandler(ctx));
     }
     private static void HandleRecommendation(RoutingContext ctx){
-        eb.request("db.receiver", new DBRecommendationRequest(), new DBRecommendationReplyHandler(ctx));
+        DBRecommendationRequest request = new DBRecommendationRequest();
+        if(ctx.get("tag")!="null")
+            request.put(ctx.get("tag"));
+        eb.request("db.receiver", request, new DBRecommendationReplyHandler(ctx));
     }
     private static void HandleRegister(RoutingContext ctx){
         String account = ctx.request().headers().get("account");

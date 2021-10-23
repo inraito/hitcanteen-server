@@ -4,10 +4,9 @@ import database.reply.*;
 import database.request.*;
 import io.vertx.core.Handler;
 import io.vertx.core.eventbus.Message;
-import database.DBReply;
 import io.vertx.sqlclient.Row;
-import io.vertx.sqlclient.Tuple;
 import verticle.DBVerticle;
+import static util.RecipeValuer.*;
 
 public class DBMessageHandler<DBRequest> implements Handler<Message<DBRequest>> {
     private final DBVerticle dbVerticle;
@@ -113,8 +112,46 @@ public class DBMessageHandler<DBRequest> implements Handler<Message<DBRequest>> 
                             .execute(result -> {
                                 if(result.succeeded()){
                                     if(result.result().size()!=0){
+
                                         DBRecommendationReply reply = new DBRecommendationReply();
-                                        //TODO
+                                        Row result_stapleFood = null;
+                                        Row result_drink = null;
+                                        Row result_refreshments = null;
+                                        for(Row r:result.result()){
+                                            switch(r.getString("category")){
+                                                case "refreshments":
+                                                    if(result_refreshments==null){
+                                                        result_refreshments = r;
+                                                        break;
+                                                    }
+                                                    else if(!value(result_refreshments, r))
+                                                        result_refreshments = r;
+                                                    break;
+                                                case "staple_food":
+                                                    if(result_stapleFood==null){
+                                                        result_stapleFood = r;
+                                                        break;
+                                                    }
+                                                    else if(!value(result_stapleFood, r))
+                                                        result_stapleFood = r;
+                                                    break;
+                                                case "drink":
+                                                    if(result_drink==null){
+                                                        result_drink = r;
+                                                        break;
+                                                    }
+                                                    else if(!value(result_drink, r))
+                                                        result_drink = r;
+                                            }
+                                            if(!(request.getTag()=="noStaple"))
+                                                reply.put(result_stapleFood.toJson());
+                                            if(!(request.getTag()=="noDrink"))
+                                                reply.put(result_drink.toJson());
+                                            if(!(request.getTag()=="noRefreshments"))
+                                                reply.put(result_refreshments.toJson());
+                                        }
+
+
                                         msg.reply(reply);
                                     }
                                     else{
