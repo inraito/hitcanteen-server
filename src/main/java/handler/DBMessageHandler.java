@@ -143,11 +143,11 @@ public class DBMessageHandler<DBRequest> implements Handler<Message<DBRequest>> 
                                                     else if(!value(result_drink, r))
                                                         result_drink = r;
                                             }
-                                            if(!(request.getTag()=="noStaple"))
+                                            if(!(request.getTag().equals("noStaple")))
                                                 reply.put(result_stapleFood.toJson());
-                                            if(!(request.getTag()=="noDrink"))
+                                            if(!(request.getTag().equals("noDrink")))
                                                 reply.put(result_drink.toJson());
-                                            if(!(request.getTag()=="noRefreshments"))
+                                            if(!(request.getTag().equals("noRefreshments")))
                                                 reply.put(result_refreshments.toJson());
                                         }
 
